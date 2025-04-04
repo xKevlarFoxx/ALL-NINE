@@ -1,11 +1,13 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@store/*": ["./store/*"],
+      "@hooks/*": ["./hooks/*"]
     }
   },
   "include": [
