@@ -19,6 +19,9 @@ interface FilterOptions {
   categories: string[];
 }
 
+const PROVIDER_DETAILS_SCREEN = '/screens/provider/ProviderDetailsScreen';
+const FILTER_SCREEN = '/screens/home/FilterScreen';
+
 export default function SearchResultsScreen() {
   const { query, filters: filterString } = useLocalSearchParams<{ 
     query: string;
@@ -57,14 +60,22 @@ export default function SearchResultsScreen() {
   };
 
   const handleProviderPress = (providerId: string) => {
-    router.push({
-      pathname: '/screens/provider/ProviderDetailsScreen',
-      params: { id: providerId }
-    });
+    try {
+      router.push({
+        pathname: PROVIDER_DETAILS_SCREEN,
+        params: { id: providerId }
+      });
+    } catch (error) {
+      console.error('Navigation to provider details failed:', error);
+    }
   };
 
   const handleFilter = () => {
-    router.push('/screens/home/FilterScreen');
+    try {
+      router.push(FILTER_SCREEN);
+    } catch (error) {
+      console.error('Navigation to filter screen failed:', error);
+    }
   };
 
   if (loading) return <LoadingState.Card />;
@@ -78,6 +89,7 @@ export default function SearchResultsScreen() {
             onSearch={handleSearch}
             placeholder="Search services..."
             autoFocus
+            accessibilityLabel="Search for services"
           />
           <View className="flex-row justify-between items-center mt-4">
             <ThemedText className="text-gray-600">
@@ -87,6 +99,8 @@ export default function SearchResultsScreen() {
               children="Filter"
               onPress={handleFilter}
               variant="secondary"
+              accessibilityLabel="Open filter options"
+              accessibilityRole="button"
             />
           </View>
         </View>
@@ -104,6 +118,8 @@ export default function SearchResultsScreen() {
               price={item.price}
               categories={item.services}
               onPress={() => handleProviderPress(item.id)}
+              accessibilityLabel={`View details for ${item.name}`}
+              accessibilityRole="button"
             />
           )}
           contentContainerStyle={{ padding: 16 }}

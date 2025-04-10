@@ -9,16 +9,23 @@ import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { useProviderStore } from '@/store/providers';
 
+const PROVIDER_DETAILS_SCREEN = '/screens/provider/ProviderDetailsScreen'; // Use constants for navigation paths
+
 export default function FeaturedScreen() {
   const { providers, loading, error } = useProviderStore();
 
+  // Filter providers with a rating of 4.5 or higher
   const featuredProviders = providers.filter(provider => provider.rating >= 4.5);
 
   const handleProviderPress = (providerId: string) => {
-    router.push({
-      pathname: '/screens/provider/ProviderDetailsScreen',
-      params: { id: providerId }
-    });
+    try {
+      router.push({
+        pathname: PROVIDER_DETAILS_SCREEN,
+        params: { id: providerId }
+      });
+    } catch (error) {
+      console.error('Navigation to provider details failed:', error); // Add error handling
+    }
   };
 
   if (loading) return <LoadingState.Card />;
@@ -47,6 +54,8 @@ export default function FeaturedScreen() {
               price={item.price}
               categories={item.services}
               onPress={() => handleProviderPress(item.id)}
+              accessibilityLabel={`View details for ${item.name}`}
+              accessibilityRole="button"
             />
           )}
           contentContainerStyle={{ paddingVertical: 16 }}

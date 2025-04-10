@@ -26,6 +26,8 @@ const CATEGORIES = [
   { key: 'electrical', title: 'Electrical' }
 ];
 
+const FILTER_RESULTS_SCREEN = '/screens/home/FilterResultsScreen'; // Use constants for navigation paths
+
 export default function FilterScreen() {
   const [filters, setFilters] = useState<FilterOptions>({
     priceRange: { min: 0, max: 1000 },
@@ -34,6 +36,7 @@ export default function FilterScreen() {
     categories: []
   });
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(true);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -60,12 +63,15 @@ export default function FilterScreen() {
   };
 
   const handleApplyFilters = () => {
-    router.push({
-      pathname: '/screens/home/SearchScreen',
-      params: { filters: JSON.stringify(filters) }
-    });
+    try {
+      router.push({
+        pathname: FILTER_RESULTS_SCREEN,
+        params: { filters: JSON.stringify(filters) }
+      });
+    } catch (error) {
+      console.error('Navigation to filter results failed:', error); // Add error handling
+    }
   };
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(true);
 
   return (
     <SafeAreaView className="flex-1">
@@ -89,6 +95,7 @@ export default function FilterScreen() {
                 onChangeText={(value) => handlePriceChange('min', value)}
                 keyboardType="numeric"
                 className="flex-1"
+                accessibilityLabel="Enter minimum price"
               />
               <Input
                 placeholder="Max"
@@ -96,6 +103,7 @@ export default function FilterScreen() {
                 onChangeText={(value) => handlePriceChange('max', value)}
                 keyboardType="numeric"
                 className="flex-1"
+                accessibilityLabel="Enter maximum price"
               />
             </View>
           </View>
@@ -106,6 +114,7 @@ export default function FilterScreen() {
               value={filters.rating}
               onChange={handleRatingChange}
               size={24}
+              accessibilityLabel="Select minimum rating"
             />
           </View>
 
@@ -115,6 +124,7 @@ export default function FilterScreen() {
               value={filters.distance.toString()}
               onChangeText={handleDistanceChange}
               keyboardType="numeric"
+              accessibilityLabel="Enter maximum distance"
             />
           </View>
         </ScrollView>
@@ -128,6 +138,8 @@ export default function FilterScreen() {
             onPress={handleApplyFilters}
             variant="primary"
             fullWidth
+            accessibilityLabel="Apply selected filters"
+            accessibilityRole="button"
           />
         </BottomSheet>
       </ThemedView>

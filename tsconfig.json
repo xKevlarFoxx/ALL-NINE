@@ -1,8 +1,9 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "jsx": "react-native", // Added to support JSX
+    "esModuleInterop": true, // Enable default imports for modules
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],

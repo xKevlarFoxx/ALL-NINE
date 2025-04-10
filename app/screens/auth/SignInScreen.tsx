@@ -281,6 +281,9 @@ const createStyles = (insets: { bottom: number }, theme: any) => StyleSheet.crea
   },
 });
 
+const SIGN_UP_SCREEN = '/screens/auth/SignUpScreen'; // Use constants for navigation paths
+const TABS_SCREEN = '/(tabs)';
+
 const SignInScreen = () => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -395,8 +398,9 @@ const SignInScreen = () => {
     try {
       // Add your authentication logic here
       await new Promise(resolve => setTimeout(resolve, 1500));
-      router.replace('/(tabs)');
+      router.replace(TABS_SCREEN); // Use constant for navigation
     } catch (error) {
+      console.error('Sign-in failed:', error); // Add error logging
       Alert.alert('Error', 'Failed to sign in. Please try again.');
     } finally {
       setIsLoading(false);
@@ -406,7 +410,13 @@ const SignInScreen = () => {
   const handleSocialSignIn = (provider: 'apple' | 'google') => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateButtonPress(socialButtonScales[provider]);
-    // Add your social authentication logic here
+    try {
+      // Add your social authentication logic here
+      console.log(`Signing in with ${provider}`);
+    } catch (error) {
+      console.error(`${provider} sign-in failed:`, error); // Add error logging
+      Alert.alert('Error', `Failed to sign in with ${provider}. Please try again.`);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -553,6 +563,25 @@ const SignInScreen = () => {
     );
   };
 
+  const renderSocialButton = (
+    provider: 'apple' | 'google',
+    icon: React.ReactNode,
+    text: string,
+    style: object
+  ) => (
+    <Animated.View style={{ transform: [{ scale: socialButtonScales[provider] }] }}>
+      <TouchableOpacity
+        style={[styles.socialButton, style]}
+        onPress={() => handleSocialSignIn(provider)}
+        accessibilityLabel={`Sign in with ${provider}`}
+        accessibilityRole="button"
+      >
+        {icon}
+        <Text style={styles.socialButtonText}>{text}</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -605,6 +634,9 @@ const SignInScreen = () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setRememberMe(!rememberMe);
             }}
+            accessibilityLabel="Remember Me"
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rememberMe }}
           >
             <View style={[
               styles.checkbox,
@@ -624,6 +656,8 @@ const SignInScreen = () => {
           <TouchableOpacity
             onPress={handleForgotPassword}
             style={styles.forgotPassword}
+            accessibilityLabel="Forgot Password"
+            accessibilityRole="button"
           >
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
@@ -637,6 +671,8 @@ const SignInScreen = () => {
             ]}
             onPress={handleSignIn}
             disabled={isLoading}
+            accessibilityLabel="Sign In"
+            accessibilityRole="button"
           >
             {isLoading ? (
               <ActivityIndicator color="white" />
@@ -653,32 +689,27 @@ const SignInScreen = () => {
         </View>
   
         <View style={styles.socialContainer}>
-          <Animated.View style={{ transform: [{ scale: socialButtonScales.apple }] }}>
-            <TouchableOpacity
-              style={[styles.socialButton, styles.appleButton]}
-              onPress={() => handleSocialSignIn('apple')}
-            >
-              <AntDesign name="apple1" size={24} color="white" />
-              <Text style={styles.socialButtonText}>Sign in with Apple</Text>
-            </TouchableOpacity>
-          </Animated.View>
-  
-          <Animated.View style={{ transform: [{ scale: socialButtonScales.google }] }}>
-            <TouchableOpacity
-              style={[styles.socialButton, styles.googleButton]}
-              onPress={() => handleSocialSignIn('google')}
-            >
-              <AntDesign name="google" size={24} color="white" />
-              <Text style={styles.socialButtonText}>Sign in with Google</Text>
-            </TouchableOpacity>
-          </Animated.View>
+          {renderSocialButton(
+            'apple',
+            <AntDesign name="apple1" size={24} color="white" />, 
+            'Sign in with Apple',
+            styles.appleButton
+          )}
+          {renderSocialButton(
+            'google',
+            <AntDesign name="google" size={24} color="white" />, 
+            'Sign in with Google',
+            styles.googleButton
+          )}
         </View>
   
         <View style={styles.footer}>
           <Text style={styles.footerText}>Not part of the family yet? </Text>
           <TouchableOpacity 
-            onPress={() => router.push('/screens/auth/SignUpScreen')}
+            onPress={() => router.push(SIGN_UP_SCREEN)}
             style={styles.createAccountButton}
+            accessibilityLabel="Create Account"
+            accessibilityRole="button"
           >
             <Text style={styles.footerLink}>Create account</Text>
           </TouchableOpacity>

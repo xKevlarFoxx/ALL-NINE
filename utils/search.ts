@@ -18,11 +18,13 @@ export const filterProviders = (
     // Search query matching
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      const matchesQuery =
-        provider.name.toLowerCase().includes(query) ||
-        provider.profession.toLowerCase().includes(query) ||
-        provider.description.toLowerCase().includes(query);
-      if (!matchesQuery) return false;
+      if (
+        !provider.name.toLowerCase().includes(query) &&
+        !provider.profession.toLowerCase().includes(query) &&
+        !provider.description.toLowerCase().includes(query)
+      ) {
+        return false;
+      }
     }
 
     // Category filter
@@ -31,22 +33,28 @@ export const filterProviders = (
     }
 
     // Rating filter
-    if (filters.minRating && provider.rating < filters.minRating) {
+    if (filters.minRating != null && provider.rating < filters.minRating) {
       return false;
     }
 
     // Price filter
-    if (filters.maxPrice && provider.pricing.basePrice > filters.maxPrice) {
+    if (filters.maxPrice != null && provider.pricing.basePrice > filters.maxPrice) {
       return false;
     }
 
     // Location filter
-    if (filters.location && !provider.location.toLowerCase().includes(filters.location.toLowerCase())) {
+    if (
+      filters.location &&
+      !provider.location.toLowerCase().includes(filters.location.toLowerCase())
+    ) {
       return false;
     }
 
     // Availability filter
-    if (filters.availability && !filters.availability.some(day => provider.availability.days.includes(day))) {
+    if (
+      filters.availability &&
+      !filters.availability.some(day => provider.availability.days.includes(day))
+    ) {
       return false;
     }
 

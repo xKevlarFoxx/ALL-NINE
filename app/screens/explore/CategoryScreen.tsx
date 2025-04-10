@@ -18,20 +18,28 @@ const CATEGORY_DETAILS = {
   gardening: { name: 'Gardening Services', icon: '🌱' }
 };
 
+const PROVIDER_DETAILS_SCREEN = '/screens/provider/ProviderDetailsScreen'; // Use constants for navigation paths
+
 export default function CategoryScreen() {
   const { category } = useLocalSearchParams<{ category: keyof typeof CATEGORY_DETAILS }>();
   const { providers, loading, error } = useProviderStore();
 
   const categoryDetails = CATEGORY_DETAILS[category];
+
+  // Filter providers based on the selected category
   const filteredProviders = providers.filter(provider => 
     provider.services.some(service => service.toLowerCase().includes(category.toLowerCase()))
   );
 
   const handleProviderPress = (providerId: string) => {
-    router.push({
-      pathname: '/screens/provider/ProviderDetailsScreen',
-      params: { id: providerId }
-    });
+    try {
+      router.push({
+        pathname: PROVIDER_DETAILS_SCREEN,
+        params: { id: providerId }
+      });
+    } catch (error) {
+      console.error('Navigation to provider details failed:', error); // Add error handling
+    }
   };
 
   if (loading) return <LoadingState.Card />;
@@ -64,6 +72,8 @@ export default function CategoryScreen() {
               price={item.price}
               categories={item.services}
               onPress={() => handleProviderPress(item.id)}
+              accessibilityLabel={`View details for ${item.name}`}
+              accessibilityRole="button"
             />
           )}
           contentContainerStyle={{ padding: 16 }}

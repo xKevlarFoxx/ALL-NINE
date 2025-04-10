@@ -25,21 +25,32 @@ const TRENDING_SEARCHES = [
   'Lawn Care'
 ];
 
+const SEARCH_RESULTS_SCREEN = '/screens/explore/SearchResultsScreen';
+const CATEGORY_SCREEN = '/screens/explore/CategoryScreen';
+
 export default function ExploreScreen() {
   const handleSearch = (query: string) => {
     if (query.trim()) {
-      router.push({
-        pathname: '/screens/explore/SearchResultsScreen',
-        params: { query }
-      });
+      try {
+        router.push({
+          pathname: SEARCH_RESULTS_SCREEN,
+          params: { query }
+        });
+      } catch (error) {
+        console.error('Navigation to search results failed:', error);
+      }
     }
   };
 
   const handleCategoryPress = (categoryId: string) => {
-    router.push({
-      pathname: '/screens/explore/CategoryScreen',
-      params: { category: categoryId }
-    });
+    try {
+      router.push({
+        pathname: CATEGORY_SCREEN,
+        params: { category: categoryId }
+      });
+    } catch (error) {
+      console.error('Navigation to category screen failed:', error);
+    }
   };
 
   return (
@@ -50,6 +61,7 @@ export default function ExploreScreen() {
           <SearchBar
             onSearch={handleSearch}
             placeholder="What service do you need?"
+            accessibilityLabel="Search for services"
           />
         </View>
 
@@ -63,6 +75,8 @@ export default function ExploreScreen() {
                     key={category.id}
                     onPress={() => handleCategoryPress(category.id)}
                     className="w-[48%] mb-4 p-4 items-center"
+                    accessibilityLabel={`Explore ${category.name} services`}
+                    accessibilityRole="button"
                   >
                     <ThemedText className="text-2xl mb-2">{category.icon}</ThemedText>
                     <ThemedText className="font-medium">{category.name}</ThemedText>
@@ -80,6 +94,8 @@ export default function ExploreScreen() {
                   key={index}
                   onPress={() => handleSearch(search)}
                   className="mb-2 p-4"
+                  accessibilityLabel={`Search for ${search}`}
+                  accessibilityRole="button"
                 >
                   <ThemedText>{search}</ThemedText>
                 </Card>

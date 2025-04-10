@@ -6,6 +6,7 @@ import { theme } from '@/constants/DesignSystem/theme';
 
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = width * 0.4; // 40% of screen width
+const SIGN_IN_SCREEN = '/screens/auth/SignInScreen'; // Use a constant for navigation path
 
 export default function CustomSplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -13,7 +14,7 @@ export default function CustomSplashScreen() {
   const { setIsLoading } = useSplashStore();
 
   useEffect(() => {
-    // Fade in animation
+    // Start fade-in and scale animations
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -28,20 +29,24 @@ export default function CustomSplashScreen() {
       })
     ]).start();
 
-    // Wait for 2 seconds then fade out
+    // Wait for 2 seconds, then fade out and navigate
     const timer = setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
       }).start(() => {
-        setIsLoading(false);
-        router.replace('/screens/auth/SignInScreen');
+        try {
+          setIsLoading(false);
+          router.replace(SIGN_IN_SCREEN); // Use constant for navigation
+        } catch (error) {
+          console.error('Navigation failed:', error); // Add error handling
+        }
       });
     }, 2000);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(timer); // Ensure timer is cleared
       fadeAnim.stopAnimation();
       scaleAnim.stopAnimation();
     };
@@ -71,7 +76,7 @@ export default function CustomSplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.primary.main, // or any dark color from your theme
+    backgroundColor: theme.colors.primary.main, // Use theme color
     alignItems: 'center',
     justifyContent: 'center',
   },

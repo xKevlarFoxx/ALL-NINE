@@ -1,11 +1,24 @@
 // components/service/EditFieldModal.tsx
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
 import { useTheme } from '../ThemeProvider';
 import { DayPicker } from './DayPicker';
+import { validateField } from '@/utils/validation';
+
+interface EditableField {
+  key: string;
+  label: string;
+  type: 'text' | 'multiline' | 'number' | 'availability';
+  validation?: {
+    required?: boolean;
+    min?: number;
+    max?: number;
+    pattern?: RegExp;
+  };
+}
 
 interface EditFieldModalProps {
   visible: boolean;
@@ -24,6 +37,63 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
 }) => {
   const theme = useTheme();
   const [value, setValue] = useState(initialValue);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateInput = useCallback((inputValue: any): boolean => {
+    if (field.validation?.required && !inputValue) {
+      setError(`${field.label} is required`);
+      return false;
+    }
+
+    if (field.type === 'number') {
+      const numValue = Number(inputValue);
+      if (isNaN(numValue)) {
+        setError('Please enter a valid number');
+        return false;
+      }
+      if (field.validation?.min !== undefined && numValue < field.validation.min) {
+        setError(`Minimum value is ${field.validation.min}`);
+        return false;
+      }
+      if (field.validation?.max !== undefined && numValue > field.validation.max) {
+        setError(`Maximum value is ${field.validation.max}`);
+        return false;
+      }
+    }
+
+    if (field.validation?.pattern && !field.validation.pattern.test(inputValue)) {
+      setError('Invalid format');
+      return false;
+    }
+
+    setError(null);
+    return true;
+  }, [field]);
+
+  const handleChange = useCallback((newValue: any) => {
+    setValue(newValue);
+    if (error) {
+      validateInput(newValue);
+    }
+  }, [error, validateInput]);
+
+  const handleSave = useCallback(async () => {
+    try {
+      setIsSubmitting(true);
+      if (!validateInput(value)) {
+        return;
+      }
+
+      await onSave(value);
+      onClose();
+    } catch (error) {
+      setError('Failed to save changes. Please try again.');
+      console.error('Save failed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [value, validateInput, onSave, onClose]);
 
   const renderEditor = () => {
     switch (field.type) {
@@ -32,14 +102,18 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
         return (
           <Input
             value={value}
-            onChangeText={setValue}
-            multiline={field.multiline}
-            numberOfLines={field.multiline ? 4 : 1}
+            onChangeText={handleChange}
+            multiline={field.type === 'multiline'}
+            numberOfLines={field.type === 'multiline' ? 4 : 1}
             style={[
               styles.input,
-              field.multiline && styles.multilineInput
+              field.type === 'multiline' && styles.multilineInput
             ]}
             placeholder={`Enter ${field.label}`}
+            error={error}
+            accessibilityLabel={field.label}
+            accessibilityHint={`Enter ${field.label}`}
+            required={field.validation?.required}
           />
         );
       
@@ -47,10 +121,14 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
         return (
           <Input
             value={String(value)}
-            onChangeText={(text) => setValue(Number(text))}
+            onChangeText={(text) => handleChange(Number(text))}
             keyboardType="numeric"
             style={styles.input}
             placeholder={`Enter ${field.label}`}
+            error={error}
+            accessibilityLabel={field.label}
+            accessibilityHint={`Enter a number for ${field.label}`}
+            required={field.validation?.required}
           />
         );
 
@@ -59,8 +137,10 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
           <DayPicker
             selectedDays={value.days}
             hours={value.hours}
-            onDaysChange={(days) => setValue({ ...value, days })}
-            onHoursChange={(hours) => setValue({ ...value, hours })}
+            onDaysChange={(days) => handleChange({ ...value, days })}
+            onHoursChange={(hours) => handleChange({ ...value, hours })}
+            error={error}
+            accessibilityLabel="Availability selection"
           />
         );
 
@@ -69,24 +149,25 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
     }
   };
 
-  const handleSave = () => {
-    onSave(value);
-    onClose();
-  };
-
   return (
     <Modal
       visible={visible}
       onClose={onClose}
       title={`Edit ${field.label}`}
+      accessibilityLabel={`Edit ${field.label}`}
     >
-      <View style={styles.container}>
+      <View 
+        style={styles.container}
+        accessibilityRole="form"
+      >
         {renderEditor()}
         <View style={styles.buttonContainer}>
           <Button
             variant="outlined"
             onPress={onClose}
             style={styles.button}
+            accessibilityLabel="Cancel editing"
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
@@ -94,6 +175,9 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
             variant="primary"
             onPress={handleSave}
             style={styles.button}
+            loading={isSubmitting}
+            disabled={!!error || isSubmitting}
+            accessibilityLabel={`Save ${field.label}`}
           >
             Save
           </Button>
@@ -117,6 +201,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    marginTop: 16,
   },
   button: {
     marginLeft: 8,

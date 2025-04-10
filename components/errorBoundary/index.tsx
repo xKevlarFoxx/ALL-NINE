@@ -6,7 +6,8 @@ import { trackError } from '../../utils/analytics';
 
 interface Props {
   children: React.ReactNode;
-  fallback?: React.ReactNode;
+  fallback?: React.ReactNode; // Custom fallback UI
+  onReset?: () => void; // Callback for resetting error state
 }
 
 interface State {
@@ -29,18 +30,27 @@ export class ErrorBoundary extends Component<Props, State> {
     trackError(error, errorInfo);
   }
 
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+    if (this.props.onReset) {
+      this.props.onReset(); // Invoke custom reset logic
+    }
+  };
+
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <View style={styles.container}>
-          <Text style={styles.title}>Oops! Something went wrong</Text>
-          <TouchableOpacity
-            onPress={() => this.setState({ hasError: false })}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
+      return (
+        this.props.fallback || (
+          <View style={styles.container}>
+            <Text style={styles.title}>Oops! Something went wrong</Text>
+            <TouchableOpacity
+              onPress={this.handleReset}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
+        )
       );
     }
 

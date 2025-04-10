@@ -1,41 +1,99 @@
 // components/service/DayPicker/index.tsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { DayPickerProps } from './types';
+import { format, isBefore, isSameDay, addMinutes } from 'date-fns';
 import { colors, spacing, typography } from '@/constants/DesignSystem';
+import { ThemedText } from '@/components/ThemedText';
+
+interface DayPickerProps {
+  selectedDate: Date;
+  selectedTime: string | null;
+  onTimeSelect: (time: string) => void;
+  style?: any;
+  minDate?: Date;
+  maxDate?: Date;
+  interval?: number;
+  unavailableSlots?: string[];
+  error?: string;
+}
 
 export const DayPicker: React.FC<DayPickerProps> = ({
   selectedDate,
   selectedTime,
   onTimeSelect,
-  style
+  style,
+  minDate = new Date(),
+  maxDate,
+  interval = 30,
+  unavailableSlots = [],
+  error,
 }) => {
-  const timeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00', '16:30', '17:00'
-  ];
+  // Generate time slots based on interval
+  const timeSlots = useMemo(() => {
+    const slots = [];
+    const start = new Date(selectedDate);
+    start.setHours(9, 0, 0, 0); // Start at 9 AM
+    const end = new Date(selectedDate);
+    end.setHours(17, 0, 0, 0); // End at 5 PM
+
+    while (isBefore(start, end)) {
+      slots.push(format(start, 'HH:mm'));
+      start.setMinutes(start.getMinutes() + interval);
+    }
+    return slots;
+  }, [interval, selectedDate]);
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('default', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
-    });
+    return format(date, 'EEEE, MMMM d');
   };
 
-  const isTimeSlotAvailable = (time: string) => {
-    // Add availability logic here
-    return true;
+  const isTimeSlotAvailable = (time: string): boolean => {
+    try {
+      const [hours, minutes] = time.split(':').map(Number);
+      const slotDate = new Date(selectedDate);
+      slotDate.setHours(hours, minutes, 0, 0);
+
+      // Check if slot is in the past
+      if (isSameDay(selectedDate, new Date()) && isBefore(slotDate, addMinutes(new Date(), 30))) {
+        return false;
+      }
+
+      // Check if slot is within min/max date range
+      if (minDate && isBefore(slotDate, minDate)) return false;
+      if (maxDate && isBefore(maxDate, slotDate)) return false;
+
+      // Check if slot is in unavailable slots
+      return !unavailableSlots.includes(time);
+    } catch (error) {
+      console.error('Error checking time slot availability:', error);
+      return false;
+    }
   };
 
   return (
-    <View style={[styles.container, style]}>
-      <Text style={styles.dateHeader}>{formatDate(selectedDate)}</Text>
+    <View 
+      style={[styles.container, style]}
+      accessibilityRole="radiogroup"
+      accessibilityLabel="Time slot selection"
+    >
+      <ThemedText 
+        style={styles.dateHeader}
+        accessibilityRole="header"
+      >
+        {formatDate(selectedDate)}
+      </ThemedText>
+
+      {error && (
+        <ThemedText style={styles.errorText}>
+          {error}
+        </ThemedText>
+      )}
+
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.timeSlotsContainer}
+        accessibilityLabel="Available time slots"
       >
         {timeSlots.map((time) => {
           const isAvailable = isTimeSlotAvailable(time);
@@ -51,14 +109,20 @@ export const DayPicker: React.FC<DayPickerProps> = ({
               ]}
               onPress={() => isAvailable && onTimeSelect(time)}
               disabled={!isAvailable}
+              accessibilityRole="radio"
+              accessibilityState={{ 
+                selected: isSelected,
+                disabled: !isAvailable 
+              }}
+              accessibilityLabel={`${time}${!isAvailable ? ', unavailable' : ''}`}
             >
-              <Text style={[
+              <ThemedText style={[
                 styles.timeText,
                 isSelected && styles.selectedTimeText,
                 !isAvailable && styles.unavailableTimeText
               ]}>
                 {time}
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           );
         })}
@@ -78,6 +142,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: spacing.medium
   },
+  errorText: {
+    color: colors.error.main,
+    marginBottom: spacing.sm
+  },
   timeSlotsContainer: {
     paddingVertical: spacing.sm
   },
@@ -88,15 +156,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.paper,
     marginRight: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.text.secondary // Changed from colors.border
+    borderColor: colors.text.secondary,
+    minWidth: 80,
+    alignItems: 'center'
   },
   selectedTimeSlot: {
     backgroundColor: colors.primary.main,
     borderColor: colors.primary.main
   },
   unavailableTimeSlot: {
-    backgroundColor: colors.background.paper, // Changed from background.disabled
-    borderColor: colors.text.secondary // Changed from colors.border
+    backgroundColor: colors.background.paper,
+    borderColor: colors.text.secondary,
+    opacity: 0.5
   },
   timeText: {
     ...typography.body2,
@@ -106,7 +177,6 @@ const styles = StyleSheet.create({
     color: colors.primary.contrastText
   },
   unavailableTimeText: {
-    color: colors.text.secondary // Changed from text.disabled
+    color: colors.text.secondary
   }
 });
-export type { DayPickerProps } from './types';

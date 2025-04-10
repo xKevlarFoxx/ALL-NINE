@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import axios from 'axios'; // Use axios for API calls
 
 export interface Provider {
   id: string;
@@ -22,28 +23,25 @@ export const useProviderStore = create<ProviderStore>((set) => ({
   providers: [],
   loading: false,
   error: null,
+
+  // Fetch providers from the API
   fetchProviders: async () => {
     set({ loading: true });
     try {
-      // TODO: Replace with actual API call
-      const mockProviders: Provider[] = [
-        {
-          id: '1',
-          name: 'John Doe',
-          rating: 4.5,
-          services: ['Cleaning', 'Maintenance'],
-          price: 50,
-          image: 'https://placeholder.com/150'
-        },
-        // Add more mock data as needed
-      ];
-      set({ providers: mockProviders, error: null });
+      const response = await axios.get<Provider[]>('/api/providers'); // Replace with actual API endpoint
+      set({ providers: response.data, error: null });
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to fetch providers' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch providers';
+      set({ error: errorMessage });
+      console.error('Error fetching providers:', errorMessage); // Log the error
     } finally {
       set({ loading: false });
     }
   },
+
+  // Set loading state
   setLoading: (loading) => set({ loading }),
+
+  // Set error state
   setError: (error) => set({ error })
 }));

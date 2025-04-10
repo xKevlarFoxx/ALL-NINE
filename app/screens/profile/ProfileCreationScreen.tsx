@@ -21,7 +21,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { EditFieldModal } from '@/components/service/EditFieldModal';
 import { ServiceModal } from '@/components/service/ServiceModal';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
-import { ErrorBoundary } from '@/components/errorBoundary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FadeInView } from '@/components/animations/FadeInView';
 import { SlideInView } from '@/components/animations/SlideInView';
 import { validateField } from '@/utils/validation';

@@ -10,6 +10,8 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { ThemedView } from '@/components/ThemedView';
 import { useProviderStore } from '@/store/providers';
 
+const PROVIDER_DETAILS_SCREEN = '/screens/provider/ProviderDetailsScreen'; // Use constants for navigation paths
+
 export default function SearchScreen() {
   const { query } = useLocalSearchParams<{ query: string }>();
   const [searchQuery, setSearchQuery] = useState(query || '');
@@ -17,6 +19,7 @@ export default function SearchScreen() {
   const [filteredProviders, setFilteredProviders] = useState(providers);
 
   useEffect(() => {
+    // Filter providers based on the search query
     const results = providers.filter(provider => 
       provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       provider.services.some(service => 
@@ -31,10 +34,14 @@ export default function SearchScreen() {
   };
 
   const handleProviderPress = (providerId: string) => {
-    router.push({
-      pathname: '/screens/provider/ProviderDetailsScreen',
-      params: { id: providerId }
-    });
+    try {
+      router.push({
+        pathname: PROVIDER_DETAILS_SCREEN,
+        params: { id: providerId }
+      });
+    } catch (error) {
+      console.error('Navigation to provider details failed:', error); // Add error handling
+    }
   };
 
   if (loading) return <LoadingState.Card />;
@@ -47,6 +54,7 @@ export default function SearchScreen() {
           onSearch={handleSearch}
           placeholder="Search services..."
           autoFocus
+          accessibilityLabel="Search for services"
         />
         <FlatList
           data={filteredProviders}
@@ -61,6 +69,8 @@ export default function SearchScreen() {
               price={item.price}
               categories={item.services}
               onPress={() => handleProviderPress(item.id)}
+              accessibilityLabel={`View details for ${item.name}`}
+              accessibilityRole="button"
             />
           )}
           contentContainerStyle={{ paddingVertical: 16 }}

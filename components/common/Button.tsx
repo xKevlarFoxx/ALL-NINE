@@ -21,8 +21,8 @@ interface ButtonProps extends TouchableOpacityProps {
   fullWidth?: boolean;
   children: React.ReactNode;
   style?: ViewStyle;
-  
   textStyle?: TextStyle;
+  accessibilityLabel?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -35,13 +35,18 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
   onPress,
+  accessibilityLabel,
   ...props
 }) => {
   const theme = useTheme();
 
   const handlePress = async (event: GestureResponderEvent) => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress?.(event);
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress?.(event);
+    } catch (error) {
+      console.error('Button press failed:', error); // Add error handling
+    }
   };
 
   const getVariantStyles = (): ViewStyle => {
@@ -139,6 +144,8 @@ export const Button: React.FC<ButtonProps> = ({
         fullWidth && styles.fullWidth,
         style,
       ]}
+      accessibilityLabel={accessibilityLabel || 'Button'} // Add default accessibility label
+      accessibilityRole="button" // Add accessibility role
       {...props}
     >
       {renderContent()}
