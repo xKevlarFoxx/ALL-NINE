@@ -1,13 +1,15 @@
 // BookingConfirmationScreen.tsx
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ThemedView } from '@/components/ThemedView';
-import { LoadingState } from '@/components/common/LoadingState';
 import { BookingConfirmation } from '@/components/service/BookingConfirmation';
 import { Button } from '@/components/common/Button';
-import { colors, spacing, shadows } from '@/constants/DesignSystem';
+import { shadows } from '@/constants/DesignSystem/shadows';
+import { spacing } from '@/constants/DesignSystem';
+import { NotificationService } from '@/services/notifications/NotificationService';
 import { BookingData } from '@/types/booking';
+import { LoadingState } from '@/components/common/LoadingState';
 
 type BookingStackParamList = {
     BookingConfirmation: { bookingId: string };
@@ -18,16 +20,42 @@ type Props = NativeStackScreenProps<BookingStackParamList, 'BookingConfirmation'
 
 export const BookingConfirmationScreen = ({ route, navigation }: Props) => {
   const { bookingId } = route.params;
-  const [booking, setBooking] = useState(null);
+  const [booking, setBooking] = useState<BookingData | null>(null);
 
   useEffect(() => {
     fetchBooking();
   }, [bookingId]);
 
+  useEffect(() => {
+    if (booking) {
+      const sendNotifications = async () => {
+        await NotificationService.scheduleNotification(
+          'Booking Confirmed!',
+          `Your booking with ${booking.provider.name} is confirmed for ${booking.date}.`,
+          Date.now() + 1000 * 60 * 60 // 1 hour from now
+        );
+
+        NotificationService.sendInAppNotification(
+          `Booking confirmed with ${booking.provider.name}`
+        );
+
+        if (booking.email) {
+          await NotificationService.sendEmailNotification(
+            booking.email,
+            'Booking Confirmation',
+            `Your booking with ${booking.provider.name} is confirmed for ${booking.date}.`
+          );
+        }
+      };
+
+      sendNotifications();
+    }
+  }, [booking]);
+
   const fetchBooking = async () => {
     try {
       const response = await fetch(`/api/bookings/${bookingId}`);
-      const data = await response.json();
+      const data: BookingData = await response.json();
       setBooking(data);
     } catch (error) {
       console.error('Failed to fetch booking:', error);
@@ -55,15 +83,14 @@ export const BookingConfirmationScreen = ({ route, navigation }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: spacing.medium
+    padding: spacing.medium,
   },
   confirmation: {
-    ...shadows.medium,
-    marginBottom: spacing.large
+    marginBottom: spacing.large,
   },
   button: {
-    ...shadows.medium
-  }
+    ...shadows.medium,
+  },
 });
 
 // BookingHistoryScreen.tsx
@@ -74,7 +101,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { ServiceCard } from '@/components/service/ServiceCard';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { colors, spacing } from '@/constants/DesignSystem';
+import { shadows } from '@/constants/DesignSystem/shadows';
+import { spacing } from '@/constants/DesignSystem';
 
 interface BookingHistory {
   id: string;
@@ -117,7 +145,6 @@ export const BookingHistoryScreen = ({ navigation }: NativeStackScreenProps<any>
         renderItem={({ item }) => (
           <ServiceCard
             title={item.serviceName}
-            subtitle={item.providerName}
             status={item.status}
             date={new Date(item.date)}
             onPress={() => navigation.navigate('BookingDetails', { bookingId: item.id })}
@@ -132,13 +159,15 @@ export const BookingHistoryScreen = ({ navigation }: NativeStackScreenProps<any>
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    padding: spacing.medium,
   },
   list: {
-    padding: spacing.medium
+    flexGrow: 1,
+    paddingBottom: spacing.large,
   },
   card: {
-    marginBottom: spacing.medium,
-    ...shadows.medium
-  }
+    marginVertical: spacing.small,
+    ...shadows.medium,
+  },
 });

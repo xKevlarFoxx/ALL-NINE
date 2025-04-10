@@ -1,8 +1,9 @@
 // services/notifications/NotificationService.ts
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+// Removed deprecated expo-permissions import
 import { Platform } from 'react-native';
-import { store } from '../../state/store';
+import { store } from '../../store/store';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -73,6 +74,9 @@ export class NotificationService {
 
   async scheduleLocalNotification(content: Notifications.NotificationContentInput, trigger?: Notifications.NotificationTriggerInput) {
     try {
+      if (!trigger) {
+        throw new Error('Notification trigger is undefined');
+      }
       const id = await Notifications.scheduleNotificationAsync({
         content,
         trigger,
@@ -96,6 +100,53 @@ export class NotificationService {
         break;
       // Add more cases as needed
     }
+  }
+
+  /**
+   * Request permissions for notifications.
+   */
+  static async requestPermissions(): Promise<boolean> {
+    const { status } = await Notifications.requestPermissionsAsync();
+    return status === 'granted';
+  }
+
+  /**
+   * Schedule a notification with customizable timing.
+   * @param userId - The ID of the user to notify.
+   * @param message - The notification message.
+   * @param timeBeforeEvent - Time before the event in minutes to send the notification.
+   */
+  static async scheduleNotification(userId: string, message: string, timeBeforeEvent: number): Promise<void> {
+    console.log(`Scheduling notification for user ${userId}: "${message}" ${timeBeforeEvent} minutes before the event.`);
+    // Mock implementation: Replace with actual notification scheduling logic.
+  }
+
+  /**
+   * Send an immediate notification.
+   * @param userId - The ID of the user to notify.
+   * @param message - The notification message.
+   */
+  static async sendNotification(userId: string, message: string): Promise<void> {
+    console.log(`Sending immediate notification to user ${userId}: "${message}"`);
+    // Mock implementation: Replace with actual notification sending logic.
+  }
+
+  /**
+   * Send an in-app notification.
+   * @param message - The message to display.
+   */
+  static sendInAppNotification(message: string): void {
+    console.log(`In-App Notification: ${message}`);
+  }
+
+  /**
+   * Send an email notification (mock implementation).
+   * @param email - The recipient's email address.
+   * @param subject - The subject of the email.
+   * @param body - The body of the email.
+   */
+  static async sendEmailNotification(email: string, subject: string, body: string): Promise<void> {
+    console.log(`Email sent to ${email} with subject: ${subject}`);
   }
 }
 

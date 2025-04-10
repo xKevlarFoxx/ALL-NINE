@@ -3,10 +3,14 @@ export interface BookingData {
     date: Date;
     time: string;
     notes?: string;
-    providerName: string;
+    provider: {
+        name: string;
+        profession: string;
+    };
     serviceName: string;
     status: 'upcoming' | 'completed' | 'cancelled';
     price?: number;
     duration?: number;
     location?: string;
-  }
+    email?: string;
+}

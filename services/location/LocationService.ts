@@ -2,6 +2,7 @@
 import * as Location from 'expo-location';
 import { permissionService, PermissionType } from '../permissions/PermissionService';
 import { analyticsService } from '../analytics/AnalyticsService';
+import { getDistance } from 'geolib';
 
 interface LocationData {
   latitude: number;
@@ -178,6 +179,30 @@ export class LocationService {
 
   isLocationTracking(): boolean {
     return this.isTracking;
+  }
+
+  /**
+   * Filter providers based on distance from a given location.
+   * @param userLocation - The user's latitude and longitude.
+   * @param providers - An array of providers with their locations.
+   * @param maxDistance - The maximum distance in meters.
+   * @returns Providers within the specified distance.
+   */
+  static filterByDistance(userLocation: { latitude: number; longitude: number }, providers: Array<{ id: string; latitude: number; longitude: number }>, maxDistance: number) {
+    return providers.filter(provider => {
+      const distance = getDistance(userLocation, { latitude: provider.latitude, longitude: provider.longitude });
+      return distance <= maxDistance;
+    });
+  }
+
+  /**
+   * Estimate travel time based on distance.
+   * @param distance - The distance in meters.
+   * @param speed - The average speed in meters per second (default: 5 m/s).
+   * @returns Estimated travel time in minutes.
+   */
+  static estimateTravelTime(distance: number, speed: number = 5): number {
+    return Math.ceil(distance / speed / 60); // Convert seconds to minutes
   }
 }
 

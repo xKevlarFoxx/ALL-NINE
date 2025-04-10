@@ -100,6 +100,9 @@ export const ProviderListScreen = () => {
           }
         }}
         onEndReachedThreshold={0.5}
+        initialNumToRender={10} // Render only 10 items initially
+        maxToRenderPerBatch={5} // Render 5 items per batch
+        windowSize={5} // Keep 5 items in memory
         ListFooterComponent={() => 
           loading ? <LoadingState.Row /> : null
         }

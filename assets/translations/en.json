@@ -1,0 +1,100 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "continue": "Continue",
+    "back": "Back",
+    "done": "Done"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "phoneNumber": "Phone Number",
+    "verificationCode": "Verification Code",
+    "enterPhone": "Enter your phone number",
+    "enterCode": "Enter verification code",
+    "verifyPhone": "Verify Phone",
+    "resendCode": "Resend verification code",
+    "codeExpired": "Verification code has expired"
+  },
+  "verification": {
+    "submitDocuments": "Submit Documents",
+    "documentTypes": {
+      "nida": "NIDA ID",
+      "businessRegistration": "Business Registration",
+      "taxClearance": "Tax Clearance Certificate",
+      "businessLicense": "Business License"
+    },
+    "uploadInstructions": "Upload a clear photo of your documents",
+    "verificationPending": "Verification in progress",
+    "verificationSuccess": "Verification completed",
+    "verificationFailed": "Verification failed"
+  },
+  "payments": {
+    "selectMethod": "Select Payment Method",
+    "amount": "Amount",
+    "payNow": "Pay Now",
+    "mobileMoney": "Mobile Money",
+    "bankTransfer": "Bank Transfer",
+    "cash": "Cash",
+    "providers": {
+      "mpesa": "M-Pesa",
+      "tigopesa": "Tigo Pesa",
+      "airtelmoney": "Airtel Money"
+    },
+    "instructions": {
+      "mpesa": "Send to number {number}",
+      "tigopesa": "Send to number {number}",
+      "airtelmoney": "Send to number {number}",
+      "bank": "Transfer to account {account}"
+    },
+    "status": {
+      "pending": "Payment pending",
+      "processing": "Processing payment",
+      "complete": "Payment complete",
+      "failed": "Payment failed"
+    }
+  },
+  "services": {
+    "categories": {
+      "cleaning": "Cleaning Services",
+      "repair": "Repair Services",
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "moving": "Moving Services",
+      "gardening": "Gardening"
+    },
+    "booking": {
+      "title": "Book Service",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time",
+      "location": "Location",
+      "notes": "Additional Notes",
+      "confirm": "Confirm Booking"
+    }
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "businessHours": "Business Hours",
+    "services": "Services",
+    "reviews": "Reviews",
+    "settings": "Settings",
+    "addService": "Add Service",
+    "verified": "Verified",
+    "premium": "Premium"
+  },
+  "errors": {
+    "network": "Network error",
+    "tryAgain": "Please try again",
+    "invalidPhone": "Invalid phone number",
+    "invalidCode": "Invalid verification code",
+    "maxAttempts": "Too many attempts. Please wait {minutes} minutes",
+    "required": "This field is required",
+    "fileTooLarge": "File is too large",
+    "unsupportedFile": "File type not supported"
+  }
+}

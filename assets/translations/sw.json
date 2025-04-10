@@ -1,0 +1,100 @@
+{
+  "common": {
+    "loading": "Inasubiri...",
+    "error": "Hitilafu imetokea",
+    "retry": "Jaribu tena",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "continue": "Endelea",
+    "back": "Rudi nyuma",
+    "done": "Imekamilika"
+  },
+  "auth": {
+    "signIn": "Ingia",
+    "signUp": "Jisajili",
+    "signOut": "Toka",
+    "phoneNumber": "Namba ya simu",
+    "verificationCode": "Namba ya uthibitisho",
+    "enterPhone": "Ingiza namba yako ya simu",
+    "enterCode": "Ingiza namba ya uthibitisho",
+    "verifyPhone": "Thibitisha namba ya simu",
+    "resendCode": "Tuma tena namba ya uthibitisho",
+    "codeExpired": "Namba ya uthibitisho imeisha muda wake"
+  },
+  "verification": {
+    "submitDocuments": "Wasilisha nyaraka",
+    "documentTypes": {
+      "nida": "Kitambulisho cha NIDA",
+      "businessRegistration": "Usajili wa Biashara",
+      "taxClearance": "Cheti cha Kodi",
+      "businessLicense": "Leseni ya Biashara"
+    },
+    "uploadInstructions": "Pakia picha wazi ya nyaraka zako",
+    "verificationPending": "Uhakiki unaendelea",
+    "verificationSuccess": "Uhakiki umekamilika",
+    "verificationFailed": "Uhakiki umeshindwa"
+  },
+  "payments": {
+    "selectMethod": "Chagua njia ya malipo",
+    "amount": "Kiasi",
+    "payNow": "Lipa sasa",
+    "mobileMoney": "Pesa mtandao",
+    "bankTransfer": "Benki",
+    "cash": "Taslimu",
+    "providers": {
+      "mpesa": "M-Pesa",
+      "tigopesa": "Tigo Pesa",
+      "airtelmoney": "Airtel Money"
+    },
+    "instructions": {
+      "mpesa": "Tuma kupitia namba {number}",
+      "tigopesa": "Tuma kupitia namba {number}",
+      "airtelmoney": "Tuma kupitia namba {number}",
+      "bank": "Tuma kwenda akaunti {account}"
+    },
+    "status": {
+      "pending": "Malipo yanasubiriwa",
+      "processing": "Malipo yanafanyiwa kazi",
+      "complete": "Malipo yamekamilika",
+      "failed": "Malipo yameshindwa"
+    }
+  },
+  "services": {
+    "categories": {
+      "cleaning": "Huduma za Usafi",
+      "repair": "Matengenezo",
+      "plumbing": "Mabomba",
+      "electrical": "Umeme",
+      "moving": "Uhamisho",
+      "gardening": "Bustani"
+    },
+    "booking": {
+      "title": "Agiza huduma",
+      "selectDate": "Chagua tarehe",
+      "selectTime": "Chagua muda",
+      "location": "Mahali",
+      "notes": "Maelezo ya ziada",
+      "confirm": "Thibitisha agizo"
+    }
+  },
+  "profile": {
+    "editProfile": "Hariri wasifu",
+    "businessHours": "Saa za kazi",
+    "services": "Huduma",
+    "reviews": "Maoni",
+    "settings": "Mipangilio",
+    "addService": "Ongeza huduma",
+    "verified": "Imethibitishwa",
+    "premium": "Premium"
+  },
+  "errors": {
+    "network": "Tatizo la mtandao",
+    "tryAgain": "Tafadhali jaribu tena",
+    "invalidPhone": "Namba ya simu si sahihi",
+    "invalidCode": "Namba ya uthibitisho si sahihi",
+    "maxAttempts": "Umezidisha majaribio. Tafadhali subiri {minutes} dakika",
+    "required": "Sehemu hii inahitajika",
+    "fileTooLarge": "Faili kubwa mno",
+    "unsupportedFile": "Aina ya faili hairuhusiwi"
+  }
+}

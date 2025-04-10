@@ -1,6 +1,6 @@
 // components/service/ReviewCard.tsx
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '../ThemeProvider';
 import { Card } from '../common/Card';
 import { Avatar } from '../common/Avatar';
@@ -21,6 +21,8 @@ interface ReviewCardProps {
   helpful?: number;
   onHelpful?: () => void;
   verified?: boolean;
+  tags?: string[];
+  photo?: string;
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({
@@ -35,6 +37,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   helpful = 0,
   onHelpful,
   verified = false,
+  tags = [],
+  photo,
 }) => {
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -110,6 +114,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           </ThemedText>
         </TouchableOpacity>
       )}
+
+      {tags.length > 0 && (
+        <View style={styles.tagsContainer}>
+          {tags.map((tag, index) => (
+            <ThemedText key={index} style={[theme.typography.caption, styles.tag]}>
+              {tag}
+            </ThemedText>
+          ))}
+        </View>
+      )}
+
+      {photo && <Image source={{ uri: photo }} style={styles.photo} />}
 
       <View style={styles.footer}>
         {onHelpful && (
@@ -205,6 +221,26 @@ const styles = StyleSheet.create({
   expandText: {
     color: '#666',
     textDecorationLine: 'underline',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  tag: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginRight: 4,
+    marginBottom: 4,
+    fontSize: 12,
+  },
+  photo: {
+    width: '100%',
+    height: 200,
+    borderRadius: 4,
+    marginTop: 8,
   },
   footer: {
     flexDirection: 'row',

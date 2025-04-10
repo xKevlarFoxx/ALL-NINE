@@ -115,4 +115,20 @@ describe('ServiceCard', () => {
     const bookButton = getByLabelText('Book Now');
     expect(bookButton).toBeTruthy();
   });
+
+  it('provides accessibility hints for interactive elements', () => {
+    const { getByLabelText } = renderWithTheme(
+      <ServiceCard {...mockProps} />
+    );
+
+    // Test main card accessibility hint
+    const card = getByLabelText(
+      `${mockProps.providerName}, ${mockProps.serviceName}. Rating: ${mockProps.rating} out of 5. ${mockProps.distance} away`
+    );
+    expect(card.props.accessibilityHint).toBe('Tap to view service details');
+
+    // Test booking button accessibility hint
+    const bookButton = getByLabelText('Book Now');
+    expect(bookButton.props.accessibilityHint).toBe('Tap to book this service');
+  });
 });
